@@ -23,5 +23,5 @@ eV2J = mpf(1.60217662e-19)
 kg2J = mpf(8.98755178780936e16)
 # Joule to kg
 J2kg = mpf(1.112650055999e-17)
-# m to light year
-m2ly = mpf(9.4607e15)
+# light year to m
+ly2m = mpf(9.4607e15)
