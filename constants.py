@@ -5,6 +5,8 @@ mp.dps = 100
 h = mpf(4.135667662e-15)
 # Planck constant J.s
 hJ = mpf(6.62607015e-34)
+# ℏ
+hbar = mpf(h/2/mp.pi)
 # Light speed m/s
 c = mpf(299792458)
 # Planck Length m

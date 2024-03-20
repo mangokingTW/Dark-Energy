@@ -1,23 +1,29 @@
 from constants import *
-from sympy import abc
 from sympy import *
 import pprint
 
 
+def printE(name, f=0):
+    if type(name) is not str:
+        f = name
+        name = None
+    print(str(f"{name}: " if name else "") + format(float(f), "e"))
+
+
 def calculate_Casimir_Effect(gap):
-    # P10nm, Pa10nm = symbols(
-    #     'P10nm, Pa10nm',
+    # P10nm, Pa10nm, k = symbols(
+    #     'P10nm, Pa10nm, k',
     #     real=True
     # )
     #
     # eq = [
     #     Eq(P10nm,
-    #        Sum(1 / (abc.k * Lp) ** 4, (abc.k, 1, gap / Lp)).doit() * (3 / 4 / pi) * c * h / 2 * Lp ** 4 / (
+    #        Sum(1 / (k * Lp) ** 4, (k, 1, gap / Lp)).doit() * (3 / 4 / pi) * c * h / 2 * Lp ** 4 / (
     #                2 * pi ** 2 * gap ** 4)),
     #     Eq(Pa10nm, (- P10nm) * eV2J)
     # ]
     # print(solve(eq, (P10nm, Pa10nm), dict=True)[0][Pa10nm])
-    print(- h * c * float(pi) / 480 / gap ** 4 * eV2J)
+    return - h * c * float(pi) / 480 / gap ** 4 * eV2J
 
 
 def calculate_ZPE(distance):
@@ -67,6 +73,16 @@ def calculate_Ers_Density(d):
     res = solve(eq, ers_density, volume, dict=True)
     print(res)
     d['ers_density'] = res[0][ers_density]
+
+
+def calculate_Vacuum_Energy(m):
+    energy_density = symbols('energy_density', real=True)
+    eq = [
+        Eq(energy_density, 2 * m ** 4 * c ** 5 / hbar ** 3)
+    ]
+    res = solve(eq, energy_density, dict=True)[0]
+    print(res)
+    return res[energy_density]
 
 
 def distance_from_redshift(redshift):
@@ -128,14 +144,17 @@ def doit():
     RU = c
     calculate_ZPE(RU)
 
-    def printE(f):
-        print(format(float(f), "e"))
-
     # J.s-1.m-3 功率密度
-    printE(SN_2006gy['ers_density'] / (4 / 3 * pi * RU ** 3))
-    printE(9.47e-27 * kg2J)
-    printE(distance_from_redshift(1089))
-    printE(SN_2006gy['energy_redshift']/SN_2006gy['distance'] / (4 / 3 * pi * RU ** 3))
+    # critical density of the universe
+    printE("Critical density", 3 * (H0 * 3) ** 2 / 8 / pi / G * kg2J)
+    # E_vac/V_vac ∝ photon/L^3, L ∝ V^0.5, h*c/L/V = h*c*L^-0.5 = h*c^0.5 if L = c
+    printE("Redshift Energy", h * c ** 6 * pi / 2 * eV2J * SN_2008D['distance'])
+    printE("Redshift Energy Density", SN_2006gy['energy_redshift'] / SN_2006gy['distance'] / (4 / 3 * pi * RU ** 3))
+    # P_vac = E*Area/Volume = (1/2)*h*c/λ * (pi*r^2) / (4/3*pi*r^3) => (if λ = c^-1,r = c^-1) => (3/8)*h*c^3 * ev2J
+    R_ved = c ** -1
+    printE("Vacuum Energy Density", (1 / 2) * h * c / R_ved * (pi * R_ved ** 2) / (4 / 3 * pi * R_ved ** 3) * eV2J)
+    # == printE((3 / 8) * h * c ** 3 * eV2J)
+    # == printE(-calculate_Casimir_Effect(2.09922509e-5))
 
 
 if __name__ == '__main__':
