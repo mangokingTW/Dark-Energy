@@ -152,9 +152,15 @@ def doit():
     printE("Redshift Energy Density", SN_2006gy['energy_redshift'] / SN_2006gy['distance'] / (4 / 3 * pi * RU ** 3))
     # P_vac = E*Area/Volume = (1/2)*h*c/λ * (pi*r^2) / (4/3*pi*r^3) => (if λ = c^-1,r = c^-1) => (3/8)*h*c^3 * ev2J
     R_ved = c ** -1
-    printE("Vacuum Energy Density", (1 / 2) * h * c / R_ved * (pi * R_ved ** 2) / (4 / 3 * pi * R_ved ** 3) * eV2J)
+    P_vac = (1 / 2) * h * c / R_ved * (pi * R_ved ** 2) / (4 / 3 * pi * R_ved ** 3) * eV2J
+    printE("Vacuum Energy Density", P_vac)
     # == printE((3 / 8) * h * c ** 3 * eV2J)
     # == printE(-calculate_Casimir_Effect(2.09922509e-5))
+    # New Hubble constant
+    P_vac_A = P_vac * (pi * R_ved ** 2)
+    printE(P_vac_A)
+    printE("New Hubble constant", sqrt(16*pi*G/3*P_vac_A))
+    # => Density of matter:Density of vacuum energy = 2.340226e-25:2.340226e-25 = 1:1
 
 
 if __name__ == '__main__':
