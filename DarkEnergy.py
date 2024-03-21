@@ -1,35 +1,39 @@
+from utils import *
 from constants import *
+
 from sympy import *
 import pprint
 
 
-def printE(name, f=0):
-    if type(name) is not str:
-        f = name
-        name = None
-    print(str(f"{name}: " if name else "") + format(float(f), "e"))
+def calculate_Casimir_Effect(diameter):
+    P10nm, k = symbols(
+        'P10nm, k',
+        real=True
+    )
+
+    # Volume of 4D ball = 1/2*pi^2*radius^4
+    eq = [
+        Eq(P10nm,
+           1 / 2 * c * h * Sum(1 / k ** 4, (k, 1, diameter / lp)).doit() / (
+                   1 / 2 * pi ** 2 * (diameter * 2) ** 4) * eV2J),
+    ]
+    printE(solve(eq, P10nm, dict=True)[0][P10nm])
+    Area = pi * (lp / diameter) ** 2
+    Volume = diameter ** 3
+    eq = [
+        Eq(P10nm,
+           1 / 2 * c * h * Sum(k, (k, 0, diameter / lp)).doit() / diameter * zeta(-3) * Area / Volume * eV2J),
+    ]
+    printE(solve(eq, P10nm, dict=True)[0][P10nm])
+    printE(1 / 2 * c * h * (lp + 0) * lp / 2 / lp ** 3 * zeta(-3) * eV2J)
+    return h * c * float(pi) / 480 / diameter ** 4 * eV2J
 
 
-def calculate_Casimir_Effect(gap):
-    # P10nm, Pa10nm, k = symbols(
-    #     'P10nm, Pa10nm, k',
-    #     real=True
-    # )
-    #
-    # eq = [
-    #     Eq(P10nm,
-    #        Sum(1 / (k * Lp) ** 4, (k, 1, gap / Lp)).doit() * (3 / 4 / pi) * c * h / 2 * Lp ** 4 / (
-    #                2 * pi ** 2 * gap ** 4)),
-    #     Eq(Pa10nm, (- P10nm) * eV2J)
-    # ]
-    # print(solve(eq, (P10nm, Pa10nm), dict=True)[0][Pa10nm])
-    return - h * c * float(pi) / 480 / gap ** 4 * eV2J
-
-
-def calculate_ZPE(distance):
+def calculate_ZPE(diameter, min_length=lp):
     ZPE, k = symbols('ZPE, k', real=True, positive=True)
     eq = [
-        Eq(ZPE, Sum(1 / k, (k, 1, distance / Lp)).doit() / Lp * c * h / 2 / (4 / 3 * pi * distance ** 3) * eV2J)
+        Eq(ZPE, Sum(k, (k, 1, diameter / min_length)).doit() / diameter * c * h / 2 / (
+                4 / 3 * pi * (diameter / 2) ** 3) * eV2J)
     ]
     a = solve(eq, ZPE, dict=True)[0]
     print(a)
@@ -98,7 +102,7 @@ def distance_from_redshift_and_P_vac(redshift, P_vac):
     distance = symbols('distance', real=True, positive=True)
     eq = [
         # 9.243700e+17 ~= (c/pi)**2
-        Eq(P_vac*distance, redshift*9.243700e+17),
+        Eq(P_vac * distance, redshift * 9.243700e+17),
     ]
     res = solve(eq, distance, dict=True)
     return res[0][distance]
@@ -107,7 +111,7 @@ def distance_from_redshift_and_P_vac(redshift, P_vac):
 def distance_from_redshift_and_hubble(redshift, hubble):
     distance = symbols('distance', real=True, positive=True)
     eq = [
-        Eq(distance, c*redshift/hubble)
+        Eq(distance, c * redshift / hubble)
     ]
     res = solve(eq, distance, dict=True)
     return res[0][distance]
@@ -167,7 +171,7 @@ def doit():
     """
     Critical density of the universe
     """
-    printE("Critical density", 3 * (H0 * 3) ** 2 / 8 / pi / G * kg2J)
+    printE("Critical density", 3 * (H0) ** 2 / 8 / pi / G * kg2J)
     """
     E_vac/V_vac ∝ photon/L^3, L ∝ V^0.5, h*c/L/V = h*c*L^-0.5 = h*c^0.5 if L = c
     """
@@ -180,21 +184,34 @@ def doit():
     P_vac = (1 / 2) * h * c / R_ved * (pi * R_ved ** 2) / (4 / 3 * pi * R_ved ** 3) * eV2J
     printE("Vacuum Energy Density", P_vac)
     """
-    == printE((3 / 8) * h * c ** 3 * eV2J)
-    == printE(-calculate_Casimir_Effect(2.09922509e-5))
+    = printE((3 / 8) * h * c ** 3 * eV2J)
+    = printE(-calculate_Casimir_Effect(2.09922509e-5))
+    == 6.694982e-09
     """
-    # New Hubble constant
     P_vac_A = P_vac * (pi * R_ved ** 2)
     printE(P_vac_A)
-    printE("New Hubble constant", sqrt(16*pi*G/3*P_vac_A))
     """
-    => Density of matter:Density of vacuum energy = 2.340226e-25:2.340226e-25 = 1:1
+    Assume Density of matter:Density of vacuum energy = 2.340226e-25:2.340226e-25 = 1:1
     """
-    printE(distance_from_redshift_and_P_vac(13, P_vac))
-    printE(distance_from_redshift(0.001))
-    printE(distance_from_redshift_and_hubble(0.001, 1.617730e-17))
+    # New Hubble constant
+    H0_new = sqrt(16 * pi * G / 3 * P_vac_A)
+    printE("New Hubble constant", H0_new)
+    printE("Critical density", 3 * H0_new ** 2 / 8 / pi / G * kg2J)
 
+    # 量子漲落時間 Qt = hbar/2/Energy
+    # c * Qt = radius
+    # 測算真空能量密度： 5.18e44 J/m3
+    # 中微子能量 < 0.8 eV 約等同波長 1.55e-6 的光
+    # 能量總和 1.675462e+04
+    def calculate_quatum_flucatation():
+        t = hbar / 2 / (0.8 * eV2J)
+        r = c * t
+        wl = 1.55e-6
+        k = symbols('k', positive=True)
+        printE("Vacuum Energy", Sum(k, (k, 1, wl / lp)).doit() / wl * (1 / 2) * h * c / (4 / 3 * pi * r ** 3) * eV2J)
 
+    calculate_quatum_flucatation()
+    printE(calculate_Casimir_Effect(1e-8))
 
 
 if __name__ == '__main__':
