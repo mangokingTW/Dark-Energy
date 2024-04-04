@@ -1,24 +1,6 @@
 from mpmath import *
 mp.dps = 100
 
-# Planck constant eV.s
-h = mpf(4.135667662e-15)
-# Planck constant J.s
-hJ = mpf(6.62607015e-34)
-# ℏ
-hbar = mpf(h/2/mp.pi)
-# Planck time
-tp = mpf(5.39116e-44)
-# quantum fluctuation time
-qft = mpf(1e-23)
-# Light speed m/s
-c = mpf(299792458)
-# Planck Length m
-lp = mpf(1.616229e-35)
-# Gravitational constant m3kg-1s-2
-G = mpf(6.6743e-11)
-# Pi
-pi = mp.pi
 # parsec to m
 pc2m = mpf(3.08567758e16)
 # Joule to eV
@@ -31,5 +13,27 @@ kg2J = mpf(8.98755178780936e16)
 J2kg = mpf(1.112650055999e-17)
 # light year to m
 ly2m = mpf(9.4607e15)
+# Planck constant eV.s
+h = mpf(4.135667662e-15)
+# Planck constant J.s
+hJ = mpf(6.62607015e-34)
+# ℏ eV.s
+hbar = mpf(h/2/mp.pi)
+# ℏ J.s
+hbarJ = mpf(h/2/mp.pi)*eV2J
+# Planck time
+tp = mpf(5.39116e-44)
+# quantum fluctuation time
+qft = mpf(1e-23)
+# Light speed m/s
+c = mpf(299792458)
+# Planck Length m
+lp = mpf(1.616229e-35)
+# Planck mass kg
+Mp = mpf(2.176434e-8)
+# Gravitational constant m3kg-1s-2
+G = mpf(6.6743e-11)
+# Pi
+pi = mp.pi
 # Hubble constant
 H0 = mpf(2.17132212e-18)
